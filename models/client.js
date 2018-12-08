@@ -8,7 +8,7 @@ const mongoose = require('mongoose'),
     cedula: {
       type: String,     
       required: [true, 'La cédula electoral del cliente es requerida'],
-      unique: true 
+  
     },
     movil: {
       type: String,

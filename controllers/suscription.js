@@ -75,7 +75,7 @@ const addSuscription = async (req, res) => {
     let suscriptionData = {
       name: req.body.name,
       total_message: req.body.total_message,
-      current_message: req.body.current_message,
+      current_message: req.body.total_message,
       client: req.body.client,    
       payment_method: data._id,
       at_suscription: new Date()

@@ -23,7 +23,7 @@ const saveClient = (client) => {
 
 const ciclyClient = () =>{ 
     let conteo = 0;
-    let promise = new Promise(async(resolve, reject) =>{
+    return new Promise(async(resolve, reject) =>{
          clients.forEach(async(client) => {              
             saveClient(client)
                 .then(() =>{
@@ -49,7 +49,7 @@ const ciclyClient = () =>{
          });     
  
     });
-    return promise;  
+
 }
 
 const uploadFile = async (req, res) => {
