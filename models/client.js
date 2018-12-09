@@ -6,9 +6,12 @@ const mongoose = require('mongoose'),
       required: [true, 'El nombre completo del cliente es requerido']
     },
     cedula: {
-      type: String,     
-      required: [true, 'La cédula electoral del cliente es requerida'],
-  
+      type: String,
+      unique: true   
+    },
+    other_id:{
+      type: String,
+      unique: true  
     },
     movil: {
       type: String,
@@ -23,7 +26,6 @@ const mongoose = require('mongoose'),
       type: String,
       lowercase: true,
       unique: true
-
     }
   })
 

@@ -25,6 +25,12 @@ const mongoose = require('mongoose'),
       enum: ['Activo', 'Pendiente', 'Completado', 'Declinado'],
       default: 'Activo'
     },
+    note: {
+      type: String     
+    },
+    at_update:{
+      type: Date     
+    },
     at_suscription: {
       type: Date,   
     },

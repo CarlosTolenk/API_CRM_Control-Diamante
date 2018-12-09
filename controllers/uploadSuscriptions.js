@@ -1,4 +1,6 @@
 const Client = require('../models/client'),
+Bill = require('../models/bill'),
+Suscription = require('../models/suscription'),
 csv = require('fast-csv'),
 c = console.log;
 
@@ -21,11 +23,24 @@ const saveClient = (client) => {
     return promise;  
 }
 
+const saveBill = (billData) => {
+    return new Promise(async (resolve, reject) => {
+        let 
+        
+
+
+    })
+}
+
+const saveSuscription = (suscription) => {
+
+}
+
 const ciclyClient = () =>{ 
     let conteo = 0;
     return new Promise(async(resolve, reject) =>{
          clients.forEach(async(client) => {              
-            saveClient(client)
+            await saveClient(client)
                 .then(() =>{
                     console.log(`SE REGISTRO EL CLIENTE ${client.fullname}`);        
                     complete.push(client);

@@ -22,4 +22,7 @@ api.use(apiClients);
 const apiBills = require('./bill');
 api.use(apiBills);
 
+const apiSMS = require('./send_sms');
+api.use(apiSMS);
+
 module.exports = api

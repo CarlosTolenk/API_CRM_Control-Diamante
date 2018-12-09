@@ -21,7 +21,7 @@ const saveClient = (client) => {
     return promise;  
 }
 
-const ciclyClient = () =>{ 
+const ciclyClient = () => { 
     let conteo = 0;
     let promise = new Promise(async(resolve, reject) =>{
          clients.forEach(async(client) => {              
