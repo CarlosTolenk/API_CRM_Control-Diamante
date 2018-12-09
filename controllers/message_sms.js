@@ -25,9 +25,7 @@ const sendMessages = (req, res) => {
         ignoreEmpty: true
     })
     .on("data", async function(data){
-        console.log("Ejectuando...");
-       await console.log(data)
-        console.log(data)
+        console.log("Ejectuando...");        
         total++;
         let formatedMessage = {
           number: data.numero,
@@ -36,13 +34,15 @@ const sendMessages = (req, res) => {
           body: bodyText
         }    
          clients.push(formatedMessage);
+         console.log(total);
    
     })
     .on("end", async function(){   
         await ciclyClient();
         res.status(200).send({
             count: total,       
-            sendClient
+            sendClient,
+            noSendClient
             });
          });
 }
@@ -83,8 +83,7 @@ const getMessages = async (req, res) => {
     return new Promise( async (resolve, reject) => {
          clients.forEach(async(client) => {              
             constructorMessage(client)
-                .then(async () => {
-                    conteo++;                    
+                .then(async () => {                                  
                     let formated = {
                         number: client.number,
                         client: client.client,
@@ -93,15 +92,21 @@ const getMessages = async (req, res) => {
                     }
                     let message = new Message(formated);
                     console.log(message);
+                    conteo++;    
+                    console.log(conteo);
 
                     saveMessage(message)
-                    .then((data) =>{
-                        sendClient.push(data);
-                        if(conteo >= total){                       
+                    .then(async(data) =>{          
+                       await sendClient.push(data);                                   
+                        if(conteo >= total){                                                    
                             resolve(true)
-                        }     
-                    })                         
-                })           
+                        }  
+                    });    
+                    // .catch((data)=>{
+                    //     console.log(data);
+                    //     reject(false)
+                    // })                     
+                });           
          });     
  
     });
@@ -116,6 +121,7 @@ const saveMessage = (message) => {
                 resolve(data)
             }else{
                 console.log("No se ha creado");
+                reject(data);
             }
        })
     })
@@ -140,7 +146,10 @@ ${send.client} gracias por ingresar a nuestro PLAN: ${send.plan}  /--/  ${send.b
         console.log(message.sid);
         resolve(true)
     })
-    .done();
+    .done((data)=>{
+        console.log(`Se termino de enviar todo ${data}`)
+        resolve(true)
+      });
     })  
 }
 
