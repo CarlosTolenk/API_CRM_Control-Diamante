@@ -74,7 +74,7 @@ const sendMessageOnly = async (req, res) => {
 const getMessages = async (req, res) => {
     await Message
     .find({})
-    .sort({ 'send_message': 1 })
+    .sort({ 'send_message': -1 })
     .exec((err, data) => apiResponse(req, res, err, data))
 }
 
