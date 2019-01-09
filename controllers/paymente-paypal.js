@@ -10,7 +10,7 @@ let usd_dop = 0;
 let InfoPay = {};
 
 paypalSDK.configure({
-    mode: "sandbox", //sandbox or live
+    mode: "live", //sandbox or live
     client_id: process.env.CLIENT_PAYPAL_ID,
     client_secret: process.env.CLIENT_PAYPAL_SECRET
 });
