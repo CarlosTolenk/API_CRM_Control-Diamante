@@ -5,9 +5,7 @@ const express = require('express'),
 
 //Home  
 api.get('/', async (req, res) => {
-  await res.status(200).send({
-    message: 'Funcionando API RESTful de CRM Control Diamante con Node.js y MongoDB.'
-  })
+     await res.render("index");
 })
 
 api.post('/authorization', signToken.createToken);
@@ -24,5 +22,8 @@ api.use(apiBills);
 
 const apiSMS = require('./send_sms');
 api.use(apiSMS);
+
+const apiPaypal = require('./paypal');
+api.use(apiPaypal);
 
 module.exports = api

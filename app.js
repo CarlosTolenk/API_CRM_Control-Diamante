@@ -4,14 +4,30 @@ const express = require('express'),
   multer = require('multer'),
   upload = multer(),
   app = express(),
-  router = require('./routes/router')
+  router = require('./routes/router'),
+  engines = require("consolidate");
+  bodyParser = require('body-parser');
 
 app
   .set('port', process.env.PORT)
   //para parsear application/json
   .use(express.json())
+  .set("views", "./views")
+  .set("view engine", "ejs")
   //para parsear application/xwww-form-urlencoded
+
+
   .use(express.urlencoded({ extended: false }))
+  .use(bodyParser.json())
+
+
+  // .use(express.urlencoded({ extended: true }))
+  // .use(express.json())
+
+
+
+
+
   //para parsear multipart/form-data
   // .use(upload.array())  
   .use(fileUpload())
