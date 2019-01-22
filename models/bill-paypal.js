@@ -1,4 +1,5 @@
 const mongoose = require('mongoose'),
+moment = require('moment')
   Schema = mongoose.Schema,
   PaypalSchema = new Schema({
     amount: {
@@ -21,10 +22,14 @@ const mongoose = require('mongoose'),
     },
     date:{
         type: Date, 
-        default: Date.now
+        default: moment()
     },
     sku:{
         type: String
+    },
+    isActive: {
+        type: Boolean,
+        default: false
     }
   })
 

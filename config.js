@@ -14,8 +14,6 @@ process.env.NUMBER_FROM_TWILIO = "+13016846880"
 process.env.CLIENT_PAYPAL_ID = 'AdCaN-s5b3kEuNGyjsQQjLWv5arag55087H1wAEzV03BG47sWRB8CsYfb16UUqdiOofKZkdqxYOos9D9'
 process.env.CLIENT_PAYPAL_SECRET = 'EAWwyaeML_1XReg-zbcYA0Ye9c_cEBJ07MLHw_WqKgn1ob1nS9mkdJ49JD92UvtM7xqEYezE_4qkCt4L'
 
-
-
 // auth token f2fb5ea3f47f5d25daca34b3e5c79731
 // AC30a179fb6e48bf18c26ce6865a5feec7
 // from +13016846880

@@ -19,6 +19,7 @@ app
 
   .use(express.urlencoded({ extended: false }))
   .use(bodyParser.json())
+  .use(express.static('./public'))
 
 
   // .use(express.urlencoded({ extended: true }))

@@ -1,5 +1,7 @@
 const Paypal = require('../models/bill-paypal');
 const paypalSDK = require("paypal-rest-sdk");
+const mongoosePaginate = require('mongoose-paginate');
+const moment = require('moment');
 const c = console.log;
 const axios = require('axios');
 const nodemailer = require('nodemailer');
@@ -129,14 +131,6 @@ const sendEmail = (payload) => {
 
 }
 
-const sending = (mailOptions) => {
-        
-
-
-}
-
-
-
 
 const apiResponse = (req, res, err, data) => {
     if (err) {
@@ -154,11 +148,34 @@ const apiResponse = (req, res, err, data) => {
     }
 }
 
+const apiResponseV2 = (req, res, err, data, count, page_num, page_size) => {
+    if (err) {
+      res.status(500).send({
+        message: `Error interno del servidor. ${err.message}`
+      })
+    } else {
+      if (data) {
+        res.status(200).send({ 
+            result: {
+                data,
+                count,
+                page_num, 
+                page_size
+            }
+         })
+      } else {
+        res.status(404).send({
+          message: `No existen datos en el API con tus parámetros de búsqueda.`
+        })
+      }
+    }
+}
+
 const getCurrency = async () => {
     try {
-      return await axios.get('https://free.currencyconverterapi.com/api/v6/convert?q=USD_DOP&compact=y')
+      return await axios.get('http://data.fixer.io/api/latest?access_key=fc0a81fc3ec1e55552d5e78d296a496d&format=1')
     } catch (error) {
-      console.error(error)
+      console.error(`EL ERROR ES EN LA API ${error}`)
     }
   }
 
@@ -172,8 +189,14 @@ const registerPayment =  async (req, res) => {
 
     const dolar = getCurrency()
         .then(response => {
-            usd_dop = payment.amount/response.data.USD_DOP.val  
-            console.log(usd_dop);  
+    
+            let DOPE = response.data.rates.DOP;
+            let USDE = response.data.rates.USD;
+            console.log(`DOP:${DOPE} USD: ${USDE}`)
+            // usd_dop = payment.amount / response.data.USD_DOP.val  
+            usd_dop = (USDE / DOPE) * payment.amount;
+            payment.
+            console.log(`EL Dolar: ${usd_dop}`);  
             res.send({
                 status: 'OK',                
             })
@@ -182,7 +205,7 @@ const registerPayment =  async (req, res) => {
         .catch((err) => {
             console.log(err);
             res.send({
-                status: 'OK',                
+                status: err,                
             })
         }) 
   
@@ -191,6 +214,10 @@ const registerPayment =  async (req, res) => {
 const cancelPayment = async (req, res) => {
     res.render("cancel");
 }  
+
+const successView = async (req, res) => {
+    res.render("success");
+}
 
 const addBillPaypal = async (payment) => { 
     await payment.save((err, data) => {
@@ -204,17 +231,187 @@ const addBillPaypal = async (payment) => {
     })
 }
 
-const getBillPaypal = async (req, res) => {
+const getBillsPaypal = async (req, res) => {
+
+    //Obtener el total de registro y la cantidad de páginas
+    // const page_size = parseInt(req.body.page_size);
+    const page_size = 11
+   
+
+    //Hacer la búsqueda respectiva
+
     await Paypal
-      .find({})  
-      .exec((err, data) => apiResponse(req, res, err, data))
+    .count()
+    .exec(async (err, count) => {
+        if(err) console.log(err)
+        if(count){
+            let page_num = parseInt(count / page_size); 
+            const skips = page_size * (page_num - 1 );
+            await Paypal
+            .find({}).limit(page_size).skip(skips)
+            .sort({date: -1})
+            .exec((err, data) => apiResponseV2(req, res, err, data, count, page_num, page_size))
+        }
+    })
+
+
+
+
+
+
+    // await Paypal
+    //   .find({}).limit(page_size).skip(skips)
+    //   .sort({date: -1})
+    //   .exec((err, data) => apiResponse(req, res, err, data))
+}
+
+
+
+
+const getBillByTerm = async (req, res) => {
+    //Búsqueda de término
+    const term = req.body.term;
+    const bus = `/^${term}$/`.toString();
+    console.log(bus);
+
+    await Paypal
+    .find({
+        $or: [
+            {
+              client: new RegExp(term, 'i')
+            },
+            {
+               suscription: new RegExp(term, 'i')
+            },
+            {
+               cedula: new RegExp(term)
+            },
+            {
+               movil: new RegExp(term)
+            },
+            {
+              sku: new RegExp(term, 'i')
+            }
+            
+        ]
+    
+    
+    })
+    .exec((err, data) => apiResponse(req, res, err, data))
+}
+
+
+const whereDatePaypal = async (req, res) => {
+    let day = req.body.day;
+    let cutoff = new Date();  
+    console.log("Entrando aqui" + day);
+
+    switch(day){
+        case '1' : 
+            console.log("Entrando al 1");
+            console.log(day + cutoff);          
+            cutoff.setDate(cutoff.getDate() - day);
+            await Paypal
+            .find({ 
+                date: {
+                    $gte: cutoff
+                }
+            })
+            .sort({date: -1})
+            .exec((err, data) => apiResponse(req, res, err, data))
+            break;
+        
+
+        case '7': 
+          console.log("Entrando al 7");
+          console.log(day + cutoff);    
+        
+          cutoff.setDate(cutoff.getDate() - day);
+          await Paypal
+          .find({ 
+              date: {
+                  $gte: cutoff
+              }
+          })
+          .sort({date: -1})
+          .exec((err, data) => apiResponse(req, res, err, data))
+          break;
+
+         case '30': 
+            console.log("Entrando al 30");
+            console.log(day + cutoff);    
+
+            cutoff.setDate(cutoff.getDate() - day);
+            await Paypal
+            .find({ 
+                date: {
+                    $gte: cutoff
+                }
+            })
+            .sort({date: -1})
+            .exec((err, data) => apiResponse(req, res, err, data))
+            break;
+
+        case '60': 
+            console.log("Entrando al 30");
+            console.log(day + cutoff);    
+
+            cutoff.setDate(cutoff.getDate() - day);
+            await Paypal
+            .find({ 
+                date: {
+                    $gte: cutoff
+                }
+            })
+            .sort({date: -1})
+            .exec((err, data) => apiResponse(req, res, err, data))
+            break;
+
+        case '90': 
+            console.log("Entrando al 30");
+            console.log(day + cutoff);    
+
+            cutoff.setDate(cutoff.getDate() - day);
+            await Paypal
+            .find({ 
+                date: {
+                    $gte: cutoff
+                }
+            })
+            .sort({date: -1})
+            .exec((err, data) => apiResponse(req, res, err, data))
+            break;
+
+        default:
+        await Paypal
+        .find({  })
+        .sort({date: -1})
+        .exec((err, data) => apiResponse(req, res, err, data))
+
+
+
+    } //END SWITCH  
+  
+}
+
+
+const activePaypal = async (req, res) => {
+    await Paypal.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true },
+      (err, data) => apiResponse(req, res, err, data)
+    )
   }
+
+
+
 
 
 const createPayment = async (req, res) => {
     console.log(InfoPay);
     let price = usd_dop.toFixed(2);
-    console.log(price);
+    console.log(`Este es el dolar: ${price}`);
 
     const create_payment_json = {
         intent: "sale",
@@ -289,7 +486,7 @@ const successPayment = async (req, res) => {
         } else {
             console.log("Get Payment Response");
             console.log(JSON.stringify(payment));
-            sendEmail(payment);
+            // sendEmail(payment);
             addBillPaypal(InfoPay);
             res.render("success");
         }
@@ -298,16 +495,16 @@ const successPayment = async (req, res) => {
 
 }
 
-
-
-
-
-
   module.exports = {
     createPayment,
     successPayment,
     registerPayment,
     cancelPayment,
-    getBillPaypal
+    getBillsPaypal,
+    successView,
+    getBillByTerm,
+    activePaypal,
+    whereDatePaypal
+    
   }
 
