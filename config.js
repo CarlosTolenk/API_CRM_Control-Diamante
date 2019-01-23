@@ -20,7 +20,7 @@ process.env.CLIENT_PAYPAL_SECRET = 'EAWwyaeML_1XReg-zbcYA0Ye9c_cEBJ07MLHw_WqKgn1
 
 if (process.env.NODE_ENV === 'dev') {
   process.env.URL_DB = 'mongodb://localhost:27017/crm-control-diamante2'
-  process.env.URL_API = 'http://localhost:3000/api/'
+  process.env.URL_API = 'http://159.65.111.29/api/'
   
 } else {
   process.env.URL_DB = 'mongodb://CTolenk:CRMControlDiamante2018!@ds223760.mlab.com:23760/crm-control-diamante'
